@@ -1,18 +1,23 @@
 package com.project.back_end.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.project.back_end.DTO.Login;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class DoctorService {
@@ -50,26 +55,26 @@ public class DoctorService {
     }
 
     @Transactional
-    public int saveDoctor(Doctor doctor) {
+    public boolean saveDoctor(Doctor doctor) {
         if (doctorRepository.findByEmail(doctor.getEmail()) != null)
-            return -1;
+            return false;
         try {
             doctorRepository.save(doctor);
-            return 1;
+            return true;
         } catch (Exception e) {
-            return 0;
+            return false;
         }
     }
 
     @Transactional
-    public int updateDoctor(Doctor doctor) {
+    public boolean updateDoctor(Doctor doctor) {
         if (!doctorRepository.existsById(doctor.getId()))
-            return -1;
+            return false;
         try {
             doctorRepository.save(doctor);
-            return 1;
+            return true;
         } catch (Exception e) {
-            return 0;
+            return false;
         }
     }
 
@@ -79,15 +84,15 @@ public class DoctorService {
     }
 
     @Transactional
-    public int deleteDoctor(long id) {
+    public boolean deleteDoctor(long id) {
         if (!doctorRepository.existsById(id))
-            return -1;
+            return false;
         try {
             appointmentRepository.deleteAllByDoctorId(id);
             doctorRepository.deleteById(id);
-            return 1;
+            return true;
         } catch (Exception e) {
-            return 0;
+            return false;
         }
     }
 

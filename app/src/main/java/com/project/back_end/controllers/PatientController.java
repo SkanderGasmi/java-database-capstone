@@ -1,25 +1,30 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.models.Patient;
-import com.project.back_end.models.Login;
-import com.project.back_end.services.PatientService;
-import com.project.back_end.services.Service_;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Patient;
+import com.project.back_end.services.PatientService;
+import com.project.back_end.services.Service_;
 
 @RestController
 @RequestMapping("/patient")
 public class PatientController {
 
     private final PatientService patientService;
-    private final Service service;
+    private final Service_ service;
 
     // Constructor injection
-    public PatientController(PatientService patientService, Service service) {
+    public PatientController(PatientService patientService, Service_ service) {
         this.patientService = patientService;
         this.service = service;
     }
@@ -66,10 +71,11 @@ public class PatientController {
         if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid or expired token"));
-        }
-        List<?> appointments = patientService.getPatientAppointment(id);
-        return ResponseEntity.ok(Map.of("appointments", appointments));
     }
+    // Pass token along to the service
+    return patientService.getPatientAppointment(id, token);
+}
+
 
     // Filter patient appointments based on condition and doctor name
     @GetMapping("/filter/{condition}/{name}/{token}")

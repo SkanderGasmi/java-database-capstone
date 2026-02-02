@@ -1,15 +1,20 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.Login;
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Admin;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
 
 @Service
 public class Service_ {
@@ -35,14 +40,12 @@ public class Service_ {
         this.patientService = patientService;
     }
 
-    public ResponseEntity<Map<String, String>> validateToken(String token, String user) {
+    public boolean validateToken(String token, String user) {
         Map<String, String> response = new HashMap<>();
         if (!tokenService.validateToken(token, user)) {
-            response.put("message", "Token is invalid or expired");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return false;
         }
-        response.put("message", "Token is valid");
-        return ResponseEntity.ok(response);
+        return true;
     }
 
     public ResponseEntity<Map<String, String>> validateAdmin(Admin receivedAdmin) {

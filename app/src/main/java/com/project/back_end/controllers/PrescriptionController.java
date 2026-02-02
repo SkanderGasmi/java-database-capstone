@@ -2,7 +2,7 @@ package com.project.back_end.controllers;
 
 import com.project.back_end.models.Prescription;
 import com.project.back_end.services.PrescriptionService;
-import com.project.back_end.services.Service;
+import com.project.back_end.services.Service_;
 import com.project.back_end.services.AppointmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +15,12 @@ import java.util.Map;
 public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
-    private final Service service;
+    private final Service_ service;
     private final AppointmentService appointmentService;
 
     // Constructor injection
     public PrescriptionController(PrescriptionService prescriptionService,
-            Service service,
+            Service_ service,
             AppointmentService appointmentService) {
         this.prescriptionService = prescriptionService;
         this.service = service;

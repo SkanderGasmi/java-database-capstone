@@ -1,19 +1,19 @@
 package com.project.back_end.services;
 
-import com.project.back_end.models.Appointment;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.DoctorRepository;
-import com.project.back_end.repo.PatientRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.project.back_end.models.Appointment;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
 
 @Service
 public class AppointmentService {
@@ -35,18 +35,18 @@ public class AppointmentService {
 
     // Book a new appointment
     @Transactional
-    public int bookAppointment(Appointment appointment) {
+    public boolean bookAppointment(Appointment appointment) {
         try {
             appointmentRepository.save(appointment);
-            return 1;
+            return true;
         } catch (Exception e) {
-            return 0;
+            return false;
         }
     }
 
     // Update an existing appointment
     @Transactional
-    public ResponseEntity<Map<String, String>> updateAppointment(Appointment appointment) {
+    public boolean updateAppointment(Appointment appointment) {
         Map<String, String> response = new HashMap<>();
         Optional<Appointment> existing = appointmentRepository.findById(appointment.getId());
 
@@ -56,16 +56,16 @@ public class AppointmentService {
             appt.setStatus(appointment.getStatus());
             appointmentRepository.save(appt);
             response.put("message", "Appointment updated successfully");
-            return ResponseEntity.ok(response);
+            return true;
         } else {
             response.put("error", "Appointment not found");
-            return ResponseEntity.badRequest().body(response);
+            return false;
         }
     }
 
     // Cancel an appointment
     @Transactional
-    public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
+    public boolean cancelAppointment(long id, String token) {
         Map<String, String> response = new HashMap<>();
         Optional<Appointment> existing = appointmentRepository.findById(id);
 
@@ -74,10 +74,10 @@ public class AppointmentService {
             // Optional: Validate user using tokenService
             appointmentRepository.delete(appt);
             response.put("message", "Appointment canceled successfully");
-            return ResponseEntity.ok(response);
+            return true;
         } else {
             response.put("error", "Appointment not found");
-            return ResponseEntity.badRequest().body(response);
+            return false;
         }
     }
 
@@ -110,4 +110,24 @@ public class AppointmentService {
     public void changeStatus(int status, long id) {
         appointmentRepository.updateStatus(status, id);
     }
+
+    public List<Map<String, Object>> getAppointment(String date, String patientName) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Transactional
+    public void updateAppointmentStatus(Long appointmentId, String status) {
+    // Convert status string to int if your repository stores it as int
+    int statusCode = switch (status.toLowerCase()) {
+        case "prescribed" -> 1;
+        case "completed" -> 2;
+        case "canceled" -> 3;
+        default -> 0; // unknown / pending
+    };
+
+    appointmentRepository.updateStatus(statusCode, appointmentId);
+}
+
+
+
 }

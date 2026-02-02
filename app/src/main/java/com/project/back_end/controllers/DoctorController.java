@@ -1,13 +1,15 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.models.Doctor;
-import com.project.back_end.models.Login;
+import com.project.back_end.DTO.Login;
 import com.project.back_end.services.DoctorService;
-import com.project.back_end.services.Service;
+import com.project.back_end.services.Service_;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +18,10 @@ import java.util.Map;
 public class DoctorController {
 
     private final DoctorService doctorService;
-    private final Service service;
+    private final Service_ service;
 
     // Constructor injection
-    public DoctorController(DoctorService doctorService, Service service) {
+    public DoctorController(DoctorService doctorService, Service_ service) {
         this.doctorService = doctorService;
         this.service = service;
     }
@@ -34,8 +36,15 @@ public class DoctorController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid or expired token"));
         }
-        Map<String, Object> availability = doctorService.getDoctorAvailability(doctorId, date);
-        return ResponseEntity.ok(availability);
+
+        try {
+            LocalDate localDate = LocalDate.parse(date); // convert string to LocalDate
+            List<String> availability = doctorService.getDoctorAvailability(doctorId, localDate);
+            return ResponseEntity.ok(availability);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid date format, expected yyyy-MM-dd"));
+        }
     }
 
     // Get all doctors

@@ -1,18 +1,20 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.AppointmentDTO;
-import com.project.back_end.DTO.Login;
-import com.project.back_end.models.Appointment;
-import com.project.back_end.models.Patient;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.PatientRepository;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.project.back_end.DTO.AppointmentDTO;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.PatientRepository;
 
 @Service
 public class PatientService {
@@ -30,13 +32,13 @@ public class PatientService {
     }
 
     // 1. Create a new patient
-    public int createPatient(Patient patient) {
+    public boolean createPatient(Patient patient) {
         try {
             patientRepository.save(patient);
-            return 1;
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return false;
         }
     }
 
@@ -117,15 +119,12 @@ public class PatientService {
 
     // 6. Get patient details by token
     @Transactional(readOnly = true)
-    public ResponseEntity<Map<String, Object>> getPatientDetails(String token) {
-        Map<String, Object> response = new HashMap<>();
+    public Patient getPatientDetails(String token) {
         String email = tokenService.extractIdentifier(token);
         Patient patient = patientRepository.findByEmail(email);
         if (patient == null) {
-            response.put("error", "Patient not found");
-            return ResponseEntity.status(404).body(response);
+            return null;
         }
-        response.put("patient", patient);
-        return ResponseEntity.ok(response);
+        return patient;
     }
 }
